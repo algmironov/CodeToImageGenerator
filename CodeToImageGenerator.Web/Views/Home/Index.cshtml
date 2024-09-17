@@ -1,0 +1,89 @@
+﻿@model CodeSubmission
+
+@{
+    ViewData["Title"] = "Code Submission";
+}
+
+<form asp-controller="Home" asp-action="SubmitCode" method="post">
+    <input type="hidden" asp-for="ChatId" />
+    <div>
+        <label asp-for="ProgrammingLanguage">Язык программирования:</label>
+        <select asp-for="ProgrammingLanguage" id="language">
+            <option value="csharp">C#</option>
+            <option value="javascript">JavaScript</option>
+            <option value="python">Python</option>
+            <option value="java">Java</option>
+            <option value="html">HTML</option>
+        </select>
+        <span asp-validation-for="ProgrammingLanguage" class="text-danger"></span>
+    </div>
+    <div>
+        <label asp-for="Code">Код:</label>
+        <textarea asp-for="Code" id="code" rows="10" cols="50"></textarea>
+        <span asp-validation-for="Code" class="text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary">Отправить</button>
+</form>
+
+@* <div id="result" style="margin-top: 20px;"></div> *@
+
+
+@*<script>
+    // Инициализация Telegram Web App
+    Telegram.WebApp.ready();
+
+    const submitBtn = document.getElementById('submitBtn');
+    const resultDiv = document.getElementById('result');
+
+    // Проверка, что оба поля заполнены
+    if (!language || !code) {
+        resultDiv.innerHTML = "<p style='color: red;'>Пожалуйста, заполните все поля.</p>";
+        return;
+    }
+
+    submitBtn.addEventListener('click', () => {
+        const language = document.getElementById('language').value;
+        const code = document.getElementById('code').value;
+
+        const chatId = Telegram.WebApp.initDataUnsafe.user.id;
+
+        const data = {
+            programmingLanguage: language,
+            code: code,
+            chatId: chatId
+        };
+
+        console.log('Sending data:', data);
+
+
+        // Отправка данных на сервер
+        fetch('/Home/SubmitCode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Ошибка отправки данных');
+            }
+        }).then(data => {
+            console.log('Успех:', data);
+            resultDiv.innerHTML = "<p style='color: green;'>Код успешно отправлен!</p>";
+            Telegram.WebApp.sendData(JSON.stringify({
+                action: 'code_submitted',
+                programmingLanguage: programmingLanguage,
+                code: code
+            }));
+            Telegram.WebApp.close();
+        }).catch(error => {
+            console.error('Ошибка:', error);
+            resultDiv.innerHTML = `<p style='color: red;'>Произошла ошибка: ${error.message}</p>`;
+        });
+    });
+</script>
+*@
+
+

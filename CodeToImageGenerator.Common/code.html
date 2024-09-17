@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>Code Image</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: transparent;
+            overflow: hidden;
+        }
+
+        .container {
+            display: inline-block;
+            background-color: #1e1e1e;
+            border-radius: 1px;
+            overflow: hidden;
+        }
+
+        pre {
+            margin: 0;
+            padding: 1px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: 'Fira Code', 'Consolas', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            display: inline-block;
+            min-width: 100%;
+        }
+
+        .language-label {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            padding: 5px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 4px;
+        }
+
+        pre::-webkit-scrollbar {
+            display: none;
+        }
+
+        pre {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css'>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js'></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            hljs.highlightAll();
+
+            const codeElement = document.querySelector('code');
+            const languageClass = codeElement.className.split(' ').find(cls => cls.startsWith('language-'));
+            const language = languageClass ? languageClass.replace('language-', '') : 'unknown';
+
+            const languageLabel = document.querySelector('.language-label');
+            languageLabel.textContent = language.toUpperCase();
+        });
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="language-label"></div>
+        <pre><code class='language-{language}'>{code}</code></pre>
+    </div>
+</body>
+</html>
