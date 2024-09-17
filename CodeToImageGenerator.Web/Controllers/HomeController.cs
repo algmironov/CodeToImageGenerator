@@ -18,12 +18,6 @@ namespace CodeToImageGenerator.Web.Controllers
             _botService = telegramBotService;
         }
 
-        //[HttpGet]
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-
         [HttpGet]
         public IActionResult Index(long? chatId) 
         {

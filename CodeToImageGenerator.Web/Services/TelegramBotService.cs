@@ -1,10 +1,9 @@
-﻿using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types;
-using Telegram.Bot;
+﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Polling;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
-using CodeToImageGenerator.Web.Controllers;
 
 namespace CodeToImageGenerator.Web.Services
 {
@@ -78,7 +77,7 @@ namespace CodeToImageGenerator.Web.Services
 
                 var webApp = new WebAppInfo
                 {
-                    Url = @$"https://cc1a-188-165-77-240.ngrok-free.app/home/index?chatId={chatId}"
+                    Url = @$"https://codepic.algmironov.com/home/index?chatId={chatId}"
                 };
 
                 try
@@ -95,7 +94,7 @@ namespace CodeToImageGenerator.Web.Services
 
         private async Task<Stream> GenerateImageFromCode(string language, string code)
         {
-            var img = await Common.ImageGenerator.Generate(language, code);
+            var img = await Common.ImageGenerator.GenerateStream(language, code);
             //await Task.Delay(5000);
             return img; 
         }
