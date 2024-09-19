@@ -1,6 +1,18 @@
+using System.Net;
+
 using CodeToImageGenerator.Web.Services;
 
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(IPAddress.Any, 80);
+    serverOptions.Listen(IPAddress.Any, 443, listenOptions =>
+    {
+        listenOptions.UseHttps("/https/fullchain.pem", "/https/privkey.pem");
+    });
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -13,20 +25,12 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 var app = builder.Build();
 
-//// Configure the HTTP request pipeline.
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler("/Home/Error");
-//    app.UseHsts();
-//}
-
-builder.WebHost.ConfigureKestrel(serverOptions =>
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
 {
-    serverOptions.ListenAnyIP(80);  // Для HTTP
-    serverOptions.ListenAnyIP(443); // Для HTTPS
-});
-
-
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
