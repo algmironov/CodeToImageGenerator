@@ -13,12 +13,18 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+//// Configure the HTTP request pipeline.
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler("/Home/Error");
+//    app.UseHsts();
+//}
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
-}
+    serverOptions.ListenAnyIP(80);  // Для HTTP
+    serverOptions.ListenAnyIP(443); // Для HTTPS
+});
 
 
 

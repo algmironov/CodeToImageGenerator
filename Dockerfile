@@ -19,7 +19,7 @@ RUN dotnet publish "CodeToImageGenerator.Web.csproj" -c Release -o /app/publish
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 80
+EXPOSE 443
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CodeToImageGenerator.Web.dll"]
