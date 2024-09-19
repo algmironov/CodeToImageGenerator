@@ -82,7 +82,8 @@ namespace CodeToImageGenerator.Common
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
                 Headless = true, // Используем headless режим
-                ExecutablePath = chromiumExecutablePath // Указываем путь к Chromium
+                ExecutablePath = chromiumExecutablePath, // Указываем путь к Chromium
+                Args =["--no-sandbox"]
             });
 
             using var page = await browser.NewPageAsync();
