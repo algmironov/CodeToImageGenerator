@@ -74,8 +74,17 @@ namespace CodeToImageGenerator.Common
                 .Replace("{language}", lang)
                 .Replace("{code}", escapedCode);
 
-            await new BrowserFetcher().DownloadAsync();
-            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            var chromiumExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
+
+            //await new BrowserFetcher().DownloadAsync();
+            //using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true, // Используем headless режим
+                ExecutablePath = chromiumExecutablePath // Указываем путь к Chromium
+            });
+
             using var page = await browser.NewPageAsync();
 
             await page.SetContentAsync(finalHtml);
