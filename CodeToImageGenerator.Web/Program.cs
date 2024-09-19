@@ -8,10 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Listen(IPAddress.Any, 80);
-    serverOptions.Listen(IPAddress.Any, 443, listenOptions =>
-    {
-        listenOptions.UseHttps("/https/fullchain.pem", "/https/privkey.pem");
-    });
+    serverOptions.Listen(IPAddress.Any, 443);
 });
 
 // Add services to the container.
