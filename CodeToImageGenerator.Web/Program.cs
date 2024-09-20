@@ -1,6 +1,15 @@
+using System.Net;
+
 using CodeToImageGenerator.Web.Services;
 
+using Microsoft.Extensions.Options;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(IPAddress.Any, 80);
+    serverOptions.Listen(IPAddress.Any, 443);
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -19,8 +28,6 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Home/Error");
     app.UseHsts();
 }
-
-
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

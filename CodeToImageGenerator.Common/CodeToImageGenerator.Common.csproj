@@ -7,18 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="code.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="code.html">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="PuppeteerSharp" Version="20.0.1-beta1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="code.html">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

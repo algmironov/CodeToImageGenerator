@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator", "Cod
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator.Common", "CodeToImageGenerator.Common\CodeToImageGenerator.Common.csproj", "{F44DA5C0-6C22-4266-B269-8E41397E767A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator.Bot", "CodeToImageGenerator.Bot\CodeToImageGenerator.Bot.csproj", "{DE5FB7F3-2B7C-40FA-A5AF-05A2A4EC922C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator.Web", "CodeToImageGenerator.Web\CodeToImageGenerator.Web.csproj", "{EA92EB59-66BC-43A6-A0B0-71F6495B346F}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{F44DA5C0-6C22-4266-B269-8E41397E767A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F44DA5C0-6C22-4266-B269-8E41397E767A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F44DA5C0-6C22-4266-B269-8E41397E767A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE5FB7F3-2B7C-40FA-A5AF-05A2A4EC922C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DE5FB7F3-2B7C-40FA-A5AF-05A2A4EC922C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DE5FB7F3-2B7C-40FA-A5AF-05A2A4EC922C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE5FB7F3-2B7C-40FA-A5AF-05A2A4EC922C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EA92EB59-66BC-43A6-A0B0-71F6495B346F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA92EB59-66BC-43A6-A0B0-71F6495B346F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA92EB59-66BC-43A6-A0B0-71F6495B346F}.Release|Any CPU.ActiveCfg = Release|Any CPU
