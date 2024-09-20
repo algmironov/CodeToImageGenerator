@@ -51,7 +51,16 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 # Определение пути к исполняемому файлу Chromium через переменную окружения
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
+# Создание нового пользователя
+RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
+    && mkdir -p /home/pptruser/Downloads \
+    && chown -R pptruser:pptruser /home/pptruser \
+    && chown -R pptruser:pptruser /app
+
 EXPOSE 80
 EXPOSE 443
 COPY --from=publish /app/publish .
+
+USER pptruser
+
 ENTRYPOINT ["dotnet", "CodeToImageGenerator.Web.dll"]
