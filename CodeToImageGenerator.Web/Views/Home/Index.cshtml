@@ -1,4 +1,4 @@
-﻿@model CodeSubmission
+﻿@model PageViewModel
 @{
     ViewData["Title"] = "Code Submission";
 }
@@ -7,22 +7,22 @@
     <div class="code-submission-form">
         <h2 class="mb-4">@ViewData["Title"]</h2>
         <form asp-controller="Home" asp-action="SubmitCode" method="post">
-            <input type="hidden" asp-for="ChatId" />
+            <input type="hidden" asp-for="CodeSubmission.ChatId" />
             <div class="mb-3">
-                <label asp-for="ProgrammingLanguage" class="form-label">Язык программирования:</label>
-                <select asp-for="ProgrammingLanguage" id="language" class="form-select">
+                <label asp-for="CodeSubmission.ProgrammingLanguage" class="form-label">Язык программирования:</label>
+                <select asp-for="CodeSubmission.ProgrammingLanguage" id="language" class="form-select">
                     <option value="csharp">C#</option>
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
                     <option value="java">Java</option>
                     <option value="html">HTML</option>
                 </select>
-                <span asp-validation-for="ProgrammingLanguage" class="text-danger"></span>
+                <span asp-validation-for="CodeSubmission.ProgrammingLanguage" class="text-danger"></span>
             </div>
             <div class="mb-3">
-                <label asp-for="Code" class="form-label">Код:</label>
-                <textarea class="form-control" asp-for="Code" id="code" rows="15"></textarea>
-                <span asp-validation-for="Code" class="text-danger"></span>
+                <label asp-for="CodeSubmission.Code" class="form-label">Код:</label>
+                <textarea class="form-control" asp-for="CodeSubmission.Code" id="code" rows="15"></textarea>
+                <span asp-validation-for="CodeSubmission.Code" class="text-danger"></span>
             </div>
             <button type="submit" class="btn btn-primary">Отправить</button>
         </form>

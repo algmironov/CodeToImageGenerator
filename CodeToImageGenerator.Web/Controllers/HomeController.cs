@@ -1,9 +1,12 @@
 using System.Diagnostics;
+using System.Reflection;
 
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
 
 using Microsoft.AspNetCore.Mvc;
+
+using Telegram.Bot.Types;
 
 namespace CodeToImageGenerator.Web.Controllers
 {
@@ -11,53 +14,120 @@ namespace CodeToImageGenerator.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly TelegramBotService _botService;
+        private readonly IImageService _imageService;
+        private const string TempFileName = "codepic_image.png";
 
-        public HomeController(ILogger<HomeController> logger, TelegramBotService telegramBotService)
+        public HomeController(ILogger<HomeController> logger, TelegramBotService telegramBotService, IImageService imageService)
         {
             _logger = logger;
             _botService = telegramBotService;
+            _imageService = imageService;
         }
 
         [HttpGet]
-        public IActionResult Index(long? chatId) 
+        public IActionResult Index(long? chatId)
         {
-            if (chatId != null)
+            var viewModel = new PageViewModel
             {
-                var submission = new CodeSubmission() { ChatId = (long) chatId };
-                return View(submission);
-            }
-            return View();
+                IsFromTelegram = chatId.HasValue,
+                CodeSubmission = new CodeSubmission
+                {
+                    ChatId = chatId
+                }
+            };
+
+            ViewData["Title"] = "Отправка кода";
+            return View(viewModel);
         }
 
         [HttpPost]
         [Route("/Home/SubmitCode")]
-        public async Task<IActionResult> SubmitCode([FromForm] CodeSubmission model)
+        public async Task<IActionResult> SubmitCode([FromForm] PageViewModel viewModel)
         {
-            _logger.LogInformation("Received data: {model}", model);
+            var codeSubmission = viewModel.CodeSubmission;
 
-            try
+            _logger.LogInformation("Received data: {viewModel}", viewModel);
+
+            if (viewModel.IsFromTelegram)
             {
-
-                if (model != null &&  ModelState.IsValid)
+                try
                 {
-                    var programmingLanguage = model.ProgrammingLanguage;
-                    var code = model.Code;
-                    var chatId = model.ChatId;
 
-                    await _botService.SendImageFromCodeAsync(chatId, programmingLanguage, code);
+                    if (codeSubmission != null && ModelState.IsValid)
+                    {
+                        var programmingLanguage = codeSubmission.ProgrammingLanguage;
+                        var code = codeSubmission.Code;
+                        var chatId = codeSubmission.ChatId;
 
-                    return RedirectToAction("Index", chatId);
+                        await _botService.SendImageFromCodeAsync((long)chatId, programmingLanguage, code);
+
+                        return RedirectToAction("Index", chatId);
+                    }
+                    _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
+
+                    ViewData["Title"] = "Отправка кода";
+                    return View("Index", viewModel);
                 }
-                _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error deserializing JSON");
 
-                return BadRequest("Something went wrong!");
+                    ViewData["Title"] = "Отправка кода";
+                    return View("Index", viewModel);
+                }
             }
-            catch (Exception ex) 
+
+            if (ModelState.IsValid)
             {
-                _logger.LogError(ex, "Error deserializing JSON");
-                return BadRequest("Invalid JSON format");
+                try
+                {
+                    var programmingLanguage = codeSubmission.ProgrammingLanguage;
+                    var code = codeSubmission.Code;
+
+                    /*
+                    var streamTask = _imageService.GenerateImageFromCodeAsync(programmingLanguage!, code);
+                    var imageStream = await streamTask;
+
+                    var filePath = Path.Combine(Path.GetTempPath(), TempFileName);
+
+                    using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
+                    imageStream.CopyTo(fileStream);
+                    */
+                    return RedirectToAction("DownloadImage", new { programmingLanguage, code });
+
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(message: "An Error occured during image generation for web user", ex);
+
+                    ViewData["Title"] = "Отправка кода";
+                    return View("Index", viewModel);
+                }
             }
+
+            ViewData["Title"] = "Отправка кода";
+            return View("Index", viewModel);
+
         }
+
+        [HttpGet]
+        public async Task<FileResult> DownloadImage(string programmingLanguage, string code)
+        {
+            var imageStream = await _imageService.GenerateImageFromCodeAsync(programmingLanguage, code);
+
+            return File(imageStream, "image/png", "generated_image.png");
+        }
+
+        /*
+        public IActionResult DownloadImage(string filePath)
+        {
+            using var image = System.IO.File.OpenRead(filePath);
+            var fileName = "codepic_image.png";
+            var mimeType = "image/png";
+
+            return File(image, mimeType, fileName);
+        }
+        */
 
         public IActionResult Privacy()
         {

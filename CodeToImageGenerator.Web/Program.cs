@@ -14,6 +14,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<TelegramBotService>();
+builder.Services.AddTransient<IImageService, ImageService>();
+
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;

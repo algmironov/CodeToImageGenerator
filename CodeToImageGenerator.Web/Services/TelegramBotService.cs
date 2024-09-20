@@ -11,14 +11,16 @@ namespace CodeToImageGenerator.Web.Services
     {
         private readonly TelegramBotClient _botClient;
         private readonly ILogger<TelegramBotService> _logger;
+        private readonly IImageService _imageService;
 
-        public TelegramBotService(ILogger<TelegramBotService> logger)
+        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService)
         {
             _logger = logger;
             var httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromMinutes(1)
             };
+            _imageService = imageService;
 #if DEBUG
             _botClient = new TelegramBotClient("7872696969:AAEg3Jp7zCzCMDCL1v1Z-eleciIfnxx2z2I", httpClient);
 #else
@@ -41,8 +43,10 @@ namespace CodeToImageGenerator.Web.Services
 
         public async Task SendImageFromCodeAsync(long chatId, string language, string code)
         {
-            var image = await GenerateImageFromCode(language, code);
+            var image = await _imageService.GenerateImageFromCodeAsync(language, code);
+
             var inputFile = new InputFileStream(image);
+
             await _botClient.SendPhotoAsync(chatId, photo: inputFile, caption: "Вот ваш результат!");
         }
 
@@ -78,12 +82,17 @@ namespace CodeToImageGenerator.Web.Services
             if (message.Text == "/start")
             {
                 var chatId = message.Chat.Id;
-
+#if DEBUG
+                var webApp = new WebAppInfo
+                {
+                    Url = @$"https://ovt464hzx076.share.zrok.io/home/index?chatId={chatId}"
+                };
+#else
                 var webApp = new WebAppInfo
                 {
                     Url = @$"https://codepic.algmironov.com/home/index?chatId={chatId}"
                 };
-
+#endif
                 try
                 {
                     await _botClient.SendTextMessageAsync(chatId, "Привет! Чтобы отправить код, откройте форму", replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithWebApp("Открыть форму", webApp)));
@@ -94,13 +103,6 @@ namespace CodeToImageGenerator.Web.Services
                 }
                 
             }
-        }
-
-        private async Task<Stream> GenerateImageFromCode(string language, string code)
-        {
-            var img = await Common.ImageGenerator.GenerateStream(language, code);
-            //await Task.Delay(5000);
-            return img; 
         }
     }
 }

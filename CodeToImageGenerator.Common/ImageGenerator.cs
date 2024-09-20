@@ -45,8 +45,6 @@ namespace CodeToImageGenerator.Common
                     Height = height
                 });
 
-                await page.ScreenshotAsync("code_screenshot.png", new ScreenshotOptions { FullPage = false, OptimizeForSpeed = true });
-
                 var screenshotTask = page.ScreenshotStreamAsync(new ScreenshotOptions { FullPage = false, OptimizeForSpeed = true });
                 var screenshot = await screenshotTask;
 
@@ -76,13 +74,10 @@ namespace CodeToImageGenerator.Common
 
             var chromiumExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
 
-            //await new BrowserFetcher().DownloadAsync();
-            //using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
-
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
             {
-                Headless = true, // Используем headless режим
-                ExecutablePath = chromiumExecutablePath, // Указываем путь к Chromium
+                Headless = true,
+                ExecutablePath = chromiumExecutablePath, 
                 Args =[
                     "--no-sandbox", 
                     "--disable-setuid-sandbox",
@@ -116,8 +111,6 @@ namespace CodeToImageGenerator.Common
                 });
 
                 var imageName = "code.png";
-
-                await page.ScreenshotAsync("code_screenshot.png", new ScreenshotOptions { FullPage = false, OptimizeForSpeed = true });
 
                 await page.ScreenshotAsync(imageName, new ScreenshotOptions { FullPage = false, OptimizeForSpeed = true });
 
