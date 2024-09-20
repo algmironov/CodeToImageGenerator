@@ -19,7 +19,11 @@ namespace CodeToImageGenerator.Web.Services
             {
                 Timeout = TimeSpan.FromMinutes(1)
             };
+#if DEBUG
+            _botClient = new TelegramBotClient("7872696969:AAEg3Jp7zCzCMDCL1v1Z-eleciIfnxx2z2I", httpClient);
+#else
             _botClient = new TelegramBotClient("7427295338:AAGX9JBYNfR0Y_haYva5k-w10AC19osodmU", httpClient);
+#endif
         }
 
         public Task StartAsync(CancellationToken cancellationToken)

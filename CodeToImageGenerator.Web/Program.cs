@@ -2,16 +2,16 @@ using System.Net;
 
 using CodeToImageGenerator.Web.Services;
 
-using Microsoft.Extensions.Options;
-
 var builder = WebApplication.CreateBuilder(args);
+
+#if !DEBUG
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Listen(IPAddress.Any, 80);
     serverOptions.Listen(IPAddress.Any, 443);
 });
+#endif
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<TelegramBotService>();
 builder.Services.AddControllers().AddJsonOptions(options =>
@@ -22,7 +22,6 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
