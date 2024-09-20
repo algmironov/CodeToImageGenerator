@@ -83,7 +83,7 @@ namespace CodeToImageGenerator.Common
             {
                 Headless = true, // Используем headless режим
                 ExecutablePath = chromiumExecutablePath, // Указываем путь к Chromium
-                Args =["--no-sandbox"]
+                Args =["--no-sandbox", "--disable-setuid-sandbox"]
             });
 
             using var page = await browser.NewPageAsync();
