@@ -1,12 +1,9 @@
 using System.Diagnostics;
-using System.Reflection;
 
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
 
 using Microsoft.AspNetCore.Mvc;
-
-using Telegram.Bot.Types;
 
 namespace CodeToImageGenerator.Web.Controllers
 {
@@ -15,9 +12,10 @@ namespace CodeToImageGenerator.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly TelegramBotService _botService;
         private readonly IImageService _imageService;
-        private const string TempFileName = "codepic_image.png";
 
-        public HomeController(ILogger<HomeController> logger, TelegramBotService telegramBotService, IImageService imageService)
+        public HomeController(ILogger<HomeController> logger, 
+                                TelegramBotService telegramBotService, 
+                                IImageService imageService)
         {
             _logger = logger;
             _botService = telegramBotService;
@@ -104,8 +102,9 @@ namespace CodeToImageGenerator.Web.Controllers
         public async Task<FileResult> DownloadImage(string programmingLanguage, string code)
         {
             var imageStream = await _imageService.GenerateImageFromCodeAsync(programmingLanguage, code);
+            var filename = _imageService.GenerateFileName(programmingLanguage);
 
-            return File(imageStream, "image/png", "generated_image.png");
+            return File(imageStream, "image/png", filename);
         }
 
         public IActionResult Privacy()
