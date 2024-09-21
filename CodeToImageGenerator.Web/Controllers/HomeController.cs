@@ -52,7 +52,6 @@ namespace CodeToImageGenerator.Web.Controllers
             {
                 try
                 {
-
                     if (codeSubmission != null && ModelState.IsValid)
                     {
                         var programmingLanguage = codeSubmission.ProgrammingLanguage;
@@ -84,15 +83,6 @@ namespace CodeToImageGenerator.Web.Controllers
                     var programmingLanguage = codeSubmission.ProgrammingLanguage;
                     var code = codeSubmission.Code;
 
-                    /*
-                    var streamTask = _imageService.GenerateImageFromCodeAsync(programmingLanguage!, code);
-                    var imageStream = await streamTask;
-
-                    var filePath = Path.Combine(Path.GetTempPath(), TempFileName);
-
-                    using var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write);
-                    imageStream.CopyTo(fileStream);
-                    */
                     return RedirectToAction("DownloadImage", new { programmingLanguage, code });
 
                 }
@@ -117,17 +107,6 @@ namespace CodeToImageGenerator.Web.Controllers
 
             return File(imageStream, "image/png", "generated_image.png");
         }
-
-        /*
-        public IActionResult DownloadImage(string filePath)
-        {
-            using var image = System.IO.File.OpenRead(filePath);
-            var fileName = "codepic_image.png";
-            var mimeType = "image/png";
-
-            return File(image, mimeType, fileName);
-        }
-        */
 
         public IActionResult Privacy()
         {

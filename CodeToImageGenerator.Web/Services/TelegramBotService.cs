@@ -85,7 +85,7 @@ namespace CodeToImageGenerator.Web.Services
 #if DEBUG
                 var webApp = new WebAppInfo
                 {
-                    Url = @$"https://ovt464hzx076.share.zrok.io/home/index?chatId={chatId}"
+                    Url = @$"https://l5h1uk1i8lce.share.zrok.io/home/index?chatId={chatId}"
                 };
 #else
                 var webApp = new WebAppInfo
