@@ -11,15 +11,24 @@ namespace CodeToImageGenerator.Web.Services
     {
         private readonly TelegramBotClient _botClient;
         private readonly ILogger<TelegramBotService> _logger;
+        private readonly IImageService _imageService;
+        private const string ProductionWebAppAddress = @"https://codepic.algmironov.com/home/index?chatId=";
+        private const string DevelopmentWebAppAddress = @"https://l5h1uk1i8lce.share.zrok.io/home/index?chatId=";
+        private const string WelcomeMessage = "Привет! Для получения картинки с Вашим кодом откройте мини-приложение";
 
-        public TelegramBotService(ILogger<TelegramBotService> logger)
+        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService)
         {
             _logger = logger;
             var httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromMinutes(1)
             };
+            _imageService = imageService;
+#if DEBUG
+            _botClient = new TelegramBotClient("7872696969:AAEg3Jp7zCzCMDCL1v1Z-eleciIfnxx2z2I", httpClient);
+#else
             _botClient = new TelegramBotClient("7427295338:AAGX9JBYNfR0Y_haYva5k-w10AC19osodmU", httpClient);
+#endif
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -37,9 +46,18 @@ namespace CodeToImageGenerator.Web.Services
 
         public async Task SendImageFromCodeAsync(long chatId, string language, string code)
         {
-            var image = await GenerateImageFromCode(language, code);
-            var inputFile = new InputFileStream(image);
-            await _botClient.SendPhotoAsync(chatId, photo: inputFile, caption: "Вот ваш результат!");
+            var image = await _imageService.GenerateImageFromCodeAsync(language, code);
+
+            var fileName = _imageService.GenerateFileName(language);
+
+            var inputFile = new InputFileStream(image, fileName);
+
+            var keyboard = GetWebAppKeyboard(chatId);
+
+            await _botClient.SendPhotoAsync(chatId: chatId,
+                                            photo: inputFile,
+                                            caption: $"Ваше изображение с кодом на языке {language}",
+                                            replyMarkup: keyboard);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -68,35 +86,45 @@ namespace CodeToImageGenerator.Web.Services
             return Task.CompletedTask;
         }
 
-        // Логика обработки команды /start и отправки формы
         private async Task HandleMessageAsync(Message message)
         {
             if (message.Text == "/start")
             {
                 var chatId = message.Chat.Id;
 
-                var webApp = new WebAppInfo
-                {
-                    Url = @$"https://codepic.algmironov.com/home/index?chatId={chatId}"
-                };
-
+                var keyboard = GetWebAppKeyboard(chatId);
                 try
                 {
-                    await _botClient.SendTextMessageAsync(chatId, "Привет! Чтобы отправить код, откройте форму", replyMarkup: new InlineKeyboardMarkup(InlineKeyboardButton.WithWebApp("Открыть форму", webApp)));
+                    await _botClient.SendTextMessageAsync(chatId, 
+                                                            WelcomeMessage, 
+                                                            replyMarkup: keyboard);
                 }
-                catch (Exception ex) 
+                catch (Exception ex)
                 {
                     Console.WriteLine(ex);
                 }
-                
+                finally
+                {
+                    await _botClient.DeleteMessageAsync(chatId, messageId: message.MessageId);
+                }
             }
         }
 
-        private async Task<Stream> GenerateImageFromCode(string language, string code)
+        private IReplyMarkup GetWebAppKeyboard(long chatId)
         {
-            var img = await Common.ImageGenerator.GenerateStream(language, code);
-            //await Task.Delay(5000);
-            return img; 
+#if DEBUG
+            var webApp = new WebAppInfo
+            {
+                Url = $"{DevelopmentWebAppAddress}{chatId}"
+            };
+#else
+                var webApp = new WebAppInfo
+                {
+                    Url = $"{ProductionWebAppAddress}{chatId}"
+                };
+#endif
+            return new InlineKeyboardMarkup(InlineKeyboardButton.WithWebApp("Открыть приложение", webApp));
+
         }
     }
 }

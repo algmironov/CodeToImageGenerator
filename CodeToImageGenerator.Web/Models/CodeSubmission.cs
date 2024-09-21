@@ -4,11 +4,15 @@
     {
         public string? ProgrammingLanguage { get; set; }
         public string? Code { get; set; }
-        public long ChatId { get; set; }
+        public long? ChatId { get; set; }
 
         public override string ToString()
         {
-            return $"{ProgrammingLanguage} {Code} {ChatId}";
+            if (ChatId != null) 
+            {
+                return $"language: {ProgrammingLanguage} {Environment.NewLine} code: {Code} {Environment.NewLine} chatId: {ChatId}";
+            }
+            return $"language: {ProgrammingLanguage} {Environment.NewLine} code: {Code} {Environment.NewLine} from Browser";
         }
     }
 }
