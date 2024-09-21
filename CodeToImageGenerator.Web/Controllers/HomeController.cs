@@ -34,7 +34,6 @@ namespace CodeToImageGenerator.Web.Controllers
                 }
             };
 
-            ViewData["Title"] = "Отправка кода";
             return View(viewModel);
         }
 
@@ -62,14 +61,12 @@ namespace CodeToImageGenerator.Web.Controllers
                     }
                     _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
 
-                    ViewData["Title"] = "Отправка кода";
                     return View("Index", viewModel);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error deserializing JSON");
 
-                    ViewData["Title"] = "Отправка кода";
                     return View("Index", viewModel);
                 }
             }
@@ -88,12 +85,10 @@ namespace CodeToImageGenerator.Web.Controllers
                 {
                     _logger.LogError(message: "An Error occured during image generation for web user", ex);
 
-                    ViewData["Title"] = "Отправка кода";
                     return View("Index", viewModel);
                 }
             }
 
-            ViewData["Title"] = "Отправка кода";
             return View("Index", viewModel);
 
         }
