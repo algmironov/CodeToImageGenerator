@@ -28,4 +28,8 @@
     <ProjectReference Include="..\CodeToImageGenerator.Common\CodeToImageGenerator.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Shared\Components\" />
+  </ItemGroup>
+
 </Project>

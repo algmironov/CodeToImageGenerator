@@ -1,8 +1,13 @@
+using System;
+using System.Buffers;
 using System.Diagnostics;
+using System.IO.Pipelines;
+using System.Text;
 
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
 
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeToImageGenerator.Web.Controllers
@@ -37,6 +42,7 @@ namespace CodeToImageGenerator.Web.Controllers
             return View(viewModel);
         }
 
+
         [HttpPost]
         [Route("/Home/SubmitCode")]
         public async Task<IActionResult> SubmitCode([FromForm] PageViewModel viewModel)
@@ -57,7 +63,7 @@ namespace CodeToImageGenerator.Web.Controllers
 
                         await _botService.SendImageFromCodeAsync((long)chatId, programmingLanguage, code);
 
-                        return RedirectToAction("Index", chatId);
+                        return View("Index", viewModel);
                     }
                     _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
 
@@ -79,7 +85,6 @@ namespace CodeToImageGenerator.Web.Controllers
                     var code = codeSubmission.Code;
 
                     return RedirectToAction("DownloadImage", new { programmingLanguage, code });
-
                 }
                 catch (Exception ex)
                 {
@@ -88,9 +93,7 @@ namespace CodeToImageGenerator.Web.Controllers
                     return View("Index", viewModel);
                 }
             }
-
             return View("Index", viewModel);
-
         }
 
         [HttpGet]
@@ -100,6 +103,12 @@ namespace CodeToImageGenerator.Web.Controllers
             var filename = _imageService.GenerateFileName(programmingLanguage);
 
             return File(imageStream, "image/png", filename);
+        }
+
+        [HttpPost]
+        public IActionResult CloseAlert(PageViewModel viewModel)
+        {
+            return RedirectToAction("Index", viewModel);
         }
 
         public IActionResult Privacy()
