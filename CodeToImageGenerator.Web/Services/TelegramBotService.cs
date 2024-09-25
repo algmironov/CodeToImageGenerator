@@ -12,8 +12,9 @@ namespace CodeToImageGenerator.Web.Services
         private readonly TelegramBotClient _botClient;
         private readonly ILogger<TelegramBotService> _logger;
         private readonly IImageService _imageService;
-        private const string ProductionWebAppAddress = @"https://codepic.algmironov.com/home/index?chatId=";
-        private const string DevelopmentWebAppAddress = @"https://l5h1uk1i8lce.share.zrok.io/home/index?chatId=";
+        private const string ProductionWebAppAddress = @"https://codepic.algmironov.com/miniapp";
+        //private const string DevelopmentWebAppAddress = @"https://3ww9c39groyq.share.zrok.io/home/index?chatId=";     
+        private const string DevelopmentWebAppAddress = @"https://3ww9c39groyq.share.zrok.io/miniapp";
         private const string WelcomeMessage = "Привет! Для получения картинки с Вашим кодом откройте мини-приложение";
 
         public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService)
@@ -115,12 +116,12 @@ namespace CodeToImageGenerator.Web.Services
 #if DEBUG
             var webApp = new WebAppInfo
             {
-                Url = $"{DevelopmentWebAppAddress}{chatId}"
+                Url = $"{DevelopmentWebAppAddress}"
             };
 #else
                 var webApp = new WebAppInfo
                 {
-                    Url = $"{ProductionWebAppAddress}{chatId}"
+                    Url = $"{ProductionWebAppAddress}"
                 };
 #endif
             return new InlineKeyboardMarkup(InlineKeyboardButton.WithWebApp("Открыть приложение", webApp));

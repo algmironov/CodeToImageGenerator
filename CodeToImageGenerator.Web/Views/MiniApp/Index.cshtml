@@ -1,0 +1,192 @@
+﻿@{
+    ViewData["Title"] = "Codepic загружается";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    //<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+   // <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    //<link rel="stylesheet" href="~/CodeToImageGenerator.Web.styles.css" asp-append-version="true" />
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="~/css/loader.css"/>
+    
+    @* <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .loading-container {
+            text-align: center;
+        }
+
+        .loading-text {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 8px solid rgba(0, 0, 0, 0.1);
+            border-top: 8px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        keyframes spin {
+            0%
+
+        {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+
+        }
+    </style> *@
+</head>
+<body>
+    @* <div class="text-center">
+        <div class=" text-success">
+            <h2>Codepic загружается...</h2>
+        </div>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Загрузка...</span>
+        </div>
+    </div> *@
+
+    <div class="container">
+        <div class="baton-0"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-1"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-2"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-3"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-4"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-5"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-6"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-7"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-8"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-9"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-10"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-11"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-12"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-13"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-14"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-15"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-16"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-17"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-18"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-19"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-20"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-21"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-22"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-23"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-24"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-25"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-26"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-27"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-28"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-29"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-30"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-31"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-32"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-33"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-34"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="baton-35"><div class="metronome"><div class="baton"></div></div></div>
+        <div class="loading-text">
+            <p>Codepic</p>
+            <p>загружается</p>
+        </div>
+    </div>
+   
+</body>
+</html>
+@* @section Scripts {
+    <script>
+        window.onload = function () {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                console.log(params);
+                const tgWebAppData = params.get('tgWebAppData');
+                if (tgWebAppData) {
+                    fetch('/api/telegram-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ tgWebAppData: tgWebAppData }),
+                    }).then(response => {
+                        if (!response.ok) {
+                            console.error('Failed to send Telegram data');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            }
+        };
+    </script>
+} *@
+
+
+@section Scripts {
+    <script>
+        window.onload = function () {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                const tgWebAppData = params.get('tgWebAppData');
+                if (tgWebAppData) {
+                    // Отправляем данные в контроллер TelegramDataController через AJAX
+                    fetch('/api/telegram-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ tgWebAppData: tgWebAppData }),
+                    }).then(response => {
+                        if (response.ok) {
+                            // Перенаправляем на основную страницу после успешной обработки
+                            window.location.href = '/';
+                        } else {
+                            console.error('Failed to process Telegram data');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            } else {
+                const isFromTelegram = false;
+                fetch('/api/telegram-data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ isFromTelegram: isFromTelegram })
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Successfully sent isFromTelegram data');
+                        } else {
+                            console.error('Failed to send isFromTelegram data');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+            }
+        };
+    </script>
+}

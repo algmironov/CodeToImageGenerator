@@ -32,4 +32,8 @@
     <Folder Include="Views\Shared\Components\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\css\loader.css" />
+  </ItemGroup>
+
 </Project>

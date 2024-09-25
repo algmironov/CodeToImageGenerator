@@ -1,13 +1,10 @@
-using System;
-using System.Buffers;
 using System.Diagnostics;
-using System.IO.Pipelines;
-using System.Text;
+using System.Text.Json;
 
+using CodeToImageGenerator.Web.Middleware;
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
 
-using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodeToImageGenerator.Web.Controllers
@@ -28,18 +25,41 @@ namespace CodeToImageGenerator.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(long? chatId)
+        public IActionResult Index(PageViewModel? viewModel)
         {
-            var viewModel = new PageViewModel
+            
+            try
             {
-                IsFromTelegram = chatId.HasValue,
-                CodeSubmission = new CodeSubmission
+                var telegramDataJson = HttpContext.Session.GetString("TelegramData");
+                if (!string.IsNullOrEmpty(telegramDataJson))
                 {
-                    ChatId = chatId
-                }
-            };
+                    var telegramData = JsonSerializer.Deserialize<TelegramMiniAppData>(telegramDataJson);
 
-            return View(viewModel);
+                    _logger.LogInformation("Received TelegramData: {telegramData}", telegramData);
+
+                    viewModel = new PageViewModel
+                    {
+                        IsFromTelegram = true,
+                        CodeSubmission = new CodeSubmission
+                        {
+                            ChatId = telegramData.User.Id,
+                        }
+                    };
+                    return View(viewModel);
+                }
+                return View(new PageViewModel());
+            }
+            catch (Exception)
+            {
+                viewModel = new PageViewModel
+                {
+                    IsFromTelegram = false,
+                    CodeSubmission = new CodeSubmission
+                    {
+                    }
+                };
+                return View(viewModel);
+            }
         }
 
 

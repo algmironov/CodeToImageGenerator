@@ -2,8 +2,21 @@
 {
     public class PageViewModel
     {
-        public bool IsFromTelegram { get; set; }
-        public CodeSubmission CodeSubmission { get; set; }
+        public bool IsFromTelegram { get; set; } = false;
+
+        private CodeSubmission? _codeSubmission;
+        public CodeSubmission? CodeSubmission 
+        {
+            get => _codeSubmission; 
+            set
+            {
+                if (value?.ChatId.HasValue == true) 
+                {
+                    IsFromTelegram = true;
+                }
+                _codeSubmission = value;
+            } 
+        }
 
         public override string ToString()
         {

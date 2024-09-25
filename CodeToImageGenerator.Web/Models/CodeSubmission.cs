@@ -10,9 +10,9 @@
         {
             if (ChatId != null) 
             {
-                return $"language: {ProgrammingLanguage} {Environment.NewLine} code: {Code} {Environment.NewLine} chatId: {ChatId}";
+                return $"language: {ProgrammingLanguage}{Environment.NewLine}code: {Code}{Environment.NewLine}User from Telegram, chatId: {ChatId}";
             }
-            return $"language: {ProgrammingLanguage} {Environment.NewLine} code: {Code} {Environment.NewLine} from Browser";
+            return $"language: {ProgrammingLanguage}{Environment.NewLine}code: {Code}{Environment.NewLine}User from Browser";
         }
     }
 }

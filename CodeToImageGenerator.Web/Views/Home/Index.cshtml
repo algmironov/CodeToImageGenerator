@@ -1,11 +1,11 @@
 ﻿@model PageViewModel
 
-
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <div class="container">
     <div class="code-submission-form">
         <h2 class="mb-4">Создание изображения из кода</h2>
         <form asp-controller="Home" asp-action="SubmitCode" method="post">
-            <input type="hidden" asp-for="IsFromTelegram"/>
+            <input type="hidden" asp-for="IsFromTelegram" />
             <input type="hidden" asp-for="CodeSubmission.ChatId" />
             <div class="mb-3">
                 <label asp-for="CodeSubmission.ProgrammingLanguage" class="form-label">Язык программирования:</label>
@@ -15,6 +15,23 @@
                     <option value="python">Python</option>
                     <option value="java">Java</option>
                     <option value="html">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="bash">Bash</option>
+                    <option value="cmd">CMD</option>
+                    <option value="dart">Dart</option>
+                    <option value="go">Go</option>
+                    <option value="json">JSON</option>
+                    <option value="kotlin">Kotlin</option>
+                    <option value="lua">Lua</option>
+                    <option value="perl">Perl</option>
+                    <option value="php">PHP</option>
+                    <option value="powershell">PowerShell</option>
+                    <option value="r">R</option>
+                    <option value="rust">Rust</option>
+                    <option value="scala">Scala</option>
+                    <option value="sql">SQL</option>
+                    <option value="swift">Swift</option>
+                    <option value="typescript">TypeScript</option>
                 </select>
                 <span asp-validation-for="CodeSubmission.ProgrammingLanguage" class="text-danger"></span>
             </div>
@@ -27,6 +44,34 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        window.onload = function () {
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const params = new URLSearchParams(hash);
+                console.log(params);
+                const tgWebAppData = params.get('tgWebAppData');
+                if (tgWebAppData) {
+                    fetch('/api/telegram-data', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ tgWebAppData: tgWebAppData }),
+                    }).then(response => {
+                        if (!response.ok) {
+                            console.error('Failed to send Telegram data');
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            }
+        };
+    </script>
+}
 
 @section Styles {
     <style>
