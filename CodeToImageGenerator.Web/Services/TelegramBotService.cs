@@ -12,24 +12,25 @@ namespace CodeToImageGenerator.Web.Services
         private readonly TelegramBotClient _botClient;
         private readonly ILogger<TelegramBotService> _logger;
         private readonly IImageService _imageService;
-        private const string ProductionWebAppAddress = @"https://codepic.algmironov.com/miniapp";
-        //private const string DevelopmentWebAppAddress = @"https://3ww9c39groyq.share.zrok.io/home/index?chatId=";     
-        private const string DevelopmentWebAppAddress = @"https://3ww9c39groyq.share.zrok.io/miniapp";
+        private readonly string _miniAppUrl;
         private const string WelcomeMessage = "Привет! Для получения картинки с Вашим кодом откройте мини-приложение";
 
-        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService)
+        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService, string botToken, string miniAppUrl)
         {
+            ArgumentNullException.ThrowIfNull(botToken, nameof(botToken));
+            ArgumentNullException.ThrowIfNull(miniAppUrl, nameof(miniAppUrl));
+
+            _miniAppUrl = miniAppUrl;
+
             _logger = logger;
+
             var httpClient = new HttpClient
             {
                 Timeout = TimeSpan.FromMinutes(1)
             };
             _imageService = imageService;
-#if DEBUG
-            _botClient = new TelegramBotClient("7872696969:AAEg3Jp7zCzCMDCL1v1Z-eleciIfnxx2z2I", httpClient);
-#else
-            _botClient = new TelegramBotClient("7427295338:AAGX9JBYNfR0Y_haYva5k-w10AC19osodmU", httpClient);
-#endif
+
+            _botClient = new TelegramBotClient(botToken, httpClient);
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -41,7 +42,7 @@ namespace CodeToImageGenerator.Web.Services
                 cancellationToken
             );
 
-            Console.WriteLine("Bot started...");
+            _logger.LogInformation("Bot started...");
             return Task.CompletedTask;
         }
 
@@ -63,7 +64,7 @@ namespace CodeToImageGenerator.Web.Services
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Console.WriteLine("Bot stopped...");
+            _logger.LogInformation("Bot stopped...");
             return Task.CompletedTask;
         }
 
@@ -83,7 +84,7 @@ namespace CodeToImageGenerator.Web.Services
                 _ => exception.ToString()
             };
 
-            Console.WriteLine(errorMessage);
+            _logger.LogError("Возникла ошибка: {errorMessage}", errorMessage);
             return Task.CompletedTask;
         }
 
@@ -113,17 +114,12 @@ namespace CodeToImageGenerator.Web.Services
 
         private IReplyMarkup GetWebAppKeyboard(long chatId)
         {
-#if DEBUG
+
             var webApp = new WebAppInfo
             {
-                Url = $"{DevelopmentWebAppAddress}"
+                Url = $"{_miniAppUrl}"
             };
-#else
-                var webApp = new WebAppInfo
-                {
-                    Url = $"{ProductionWebAppAddress}"
-                };
-#endif
+
             return new InlineKeyboardMarkup(InlineKeyboardButton.WithWebApp("Открыть приложение", webApp));
 
         }

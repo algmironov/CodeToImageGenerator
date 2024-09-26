@@ -8,7 +8,7 @@ using System.Web;
 namespace CodeToImageGenerator.Web.Controllers
 {
     [ApiController]
-    [Route("api/telegram-data")]  // Changed from [Route("api/[controller]")]
+    [Route("api/telegram-data")]
     public class TelegramDataController : ControllerBase
     {
         [HttpPost]
@@ -44,25 +44,33 @@ namespace CodeToImageGenerator.Web.Controllers
             var result = new TelegramMiniAppData();
             var dict = new Dictionary<string, string>();
 
-            foreach (var pair in pairs)
+            try
             {
-                var parts = pair.Split('=');
-                if (parts.Length == 2)
+                foreach (var pair in pairs)
                 {
-                    dict[parts[0]] = HttpUtility.UrlDecode(parts[1]);
+                    var parts = pair.Split('=');
+                    if (parts.Length == 2)
+                    {
+                        dict[parts[0]] = HttpUtility.UrlDecode(parts[1]);
+                    }
                 }
+
+                result.QueryId = dict.GetValueOrDefault("query_id");
+                result.AuthDate = long.TryParse(dict.GetValueOrDefault("auth_date"), out var authDate) ? authDate : 0;
+                result.Hash = dict.GetValueOrDefault("hash");
+
+                if (dict.TryGetValue("user", out var userJson))
+                {
+                    result.User = JsonSerializer.Deserialize<TelegramUser>(userJson);
+                }
+
+                return result;
             }
-
-            result.QueryId = dict.GetValueOrDefault("query_id");
-            result.AuthDate = long.TryParse(dict.GetValueOrDefault("auth_date"), out var authDate) ? authDate : 0;
-            result.Hash = dict.GetValueOrDefault("hash");
-
-            if (dict.TryGetValue("user", out var userJson))
+            catch (Exception ex)
             {
-                result.User = JsonSerializer.Deserialize<TelegramUser>(userJson);
+                Console.WriteLine($"Возникла ошибка: {ex}{Environment.NewLine}при  парсинге данных от Телеграм: {data}");
+                return result;
             }
-
-            return result;
         }
     }
 

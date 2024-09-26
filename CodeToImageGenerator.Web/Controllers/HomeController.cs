@@ -15,8 +15,8 @@ namespace CodeToImageGenerator.Web.Controllers
         private readonly TelegramBotService _botService;
         private readonly IImageService _imageService;
 
-        public HomeController(ILogger<HomeController> logger, 
-                                TelegramBotService telegramBotService, 
+        public HomeController(ILogger<HomeController> logger,
+                                TelegramBotService telegramBotService,
                                 IImageService imageService)
         {
             _logger = logger;
@@ -27,7 +27,11 @@ namespace CodeToImageGenerator.Web.Controllers
         [HttpGet]
         public IActionResult Index(PageViewModel? viewModel)
         {
-            
+            if (IsValid(viewModel))
+            {
+                return View(viewModel);
+            }
+
             try
             {
                 var telegramDataJson = HttpContext.Session.GetString("TelegramData");
@@ -145,6 +149,13 @@ namespace CodeToImageGenerator.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private static bool IsValid(PageViewModel? viewModel)
+        {
+            return viewModel != null 
+                && viewModel.CodeSubmission != null 
+                && viewModel.CodeSubmission.ChatId.HasValue;
         }
     }
 }

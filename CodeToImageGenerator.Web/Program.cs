@@ -1,10 +1,11 @@
-using System.Net;
+using System.Net; // используется в Release сборке, не удалять!
 
 using CodeToImageGenerator.Web.Middleware;
 using CodeToImageGenerator.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Используется в Release сборке, для отладки не нужно
 #if !DEBUG
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -13,9 +14,19 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 #endif
 
+var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
+var webAppAddress = Environment.GetEnvironmentVariable("WEB_APP_URL");
+
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<TelegramBotService>();
+
 builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddSingleton<TelegramBotService>(
+        sp => new TelegramBotService(
+        sp.GetRequiredService<ILogger<TelegramBotService>>(),
+        sp.GetRequiredService<IImageService>(),
+        botToken,
+        webAppAddress
+    ));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
