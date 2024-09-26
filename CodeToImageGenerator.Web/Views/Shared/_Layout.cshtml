@@ -12,7 +12,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
-    @if (!Model.IsFromTelegram)
+    @if (Model != null && !Model.IsFromTelegram)
     {
         <header>
             <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
@@ -40,7 +40,7 @@
         </main>
     </div>
 
-    @if (!Model.IsFromTelegram)
+    @if (Model != null && !Model.IsFromTelegram)
     {
         <footer class="border-top footer text-muted">
             <div class="container">

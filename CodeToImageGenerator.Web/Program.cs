@@ -1,9 +1,10 @@
-using System.Net;
+using System.Net; // используется в Release сборке, не удалять!
 
 using CodeToImageGenerator.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Используется в Release сборке, для отладки не нужно
 #if !DEBUG
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -12,15 +13,31 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 #endif
 
+var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
+var webAppAddress = Environment.GetEnvironmentVariable("WEB_APP_URL");
+
 builder.Services.AddControllersWithViews();
-builder.Services.AddSingleton<TelegramBotService>();
+
 builder.Services.AddTransient<IImageService, ImageService>();
+builder.Services.AddSingleton<TelegramBotService>(
+        sp => new TelegramBotService(
+        sp.GetRequiredService<ILogger<TelegramBotService>>(),
+        sp.GetRequiredService<IImageService>(),
+        botToken,
+        webAppAddress
+    ));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
     options.JsonSerializerOptions.PropertyNamingPolicy = null;
 });
 
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 
 var app = builder.Build();
 
@@ -33,6 +50,8 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
+app.UseSession();
+
 app.UseRouting();
 
 app.UseAuthorization();
@@ -40,6 +59,9 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+app.MapControllerRoute(
+    name: "TelegramWebApp",
+    pattern: "{controller=Home}/{action=Index}/{initData}");
 
 app.MapControllers();
 

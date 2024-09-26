@@ -6,20 +6,42 @@ using PuppeteerSharp;
 
 namespace CodeToImageGenerator.Common
 {
+    /// <summary>
+    /// Класс, в котором преобразуется текстовый фрагмент кода в изображение
+    /// </summary>
     public class ImageGenerator
     {
+        /// <summary>
+        /// Превращает строку с фрагментом кода в скриншот с подсветкой синтаксиса
+        /// </summary>
+        /// <param name="lang">Язык программирования</param>
+        /// <param name="code">Фрагмент кода</param>
+        /// <returns>Stream с массивом байтов для отправки или загрузки изображения</returns>
         public async static Task<Stream> GenerateStream(string lang, string code)
         {
-            var htmlTemplate = File.ReadAllText("code.html");
+            var finalHtml = PrepareHTML(lang, code);
 
-            var escapedCode = HttpUtility.HtmlEncode(code);
-
-            var finalHtml = htmlTemplate
-                .Replace("{language}", lang)
-                .Replace("{code}", escapedCode);
-
+#if DEBUG
             await new BrowserFetcher().DownloadAsync();
-            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true
+            });
+#else
+            var chromiumExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true,
+                ExecutablePath = chromiumExecutablePath, 
+                Args =[
+                    "--no-sandbox", 
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage", 
+                    "--disable-gpu"]
+            });
+#endif
             using var page = await browser.NewPageAsync();
 
             await page.SetContentAsync(finalHtml);
@@ -52,8 +74,9 @@ namespace CodeToImageGenerator.Common
                 
                 return screenshot;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Unexpeced exception during screenshot creation: {ex.Message}");
                 return null;
             }
             finally
@@ -62,16 +85,24 @@ namespace CodeToImageGenerator.Common
             }
         }
 
+        /// <summary>
+        /// Превращает строку с фрагментом кода в изображение, сохраняет его в формате .png и возвращает имя файла
+        /// </summary>
+        /// <param name="lang">Язык программирования</param>
+        /// <param name="code">Фрагмент кода</param>
+        /// <returns>Имя файла с изображением</returns>
         public async static Task<string> GenerateImage(string lang, string code)
         {
-            var htmlTemplate = File.ReadAllText("code.html");
+            var finalHtml = PrepareHTML(lang, code);
 
-            var escapedCode = HttpUtility.HtmlEncode(code);
+#if DEBUG
+            await new BrowserFetcher().DownloadAsync();
 
-            var finalHtml = htmlTemplate
-                .Replace("{language}", lang)
-                .Replace("{code}", escapedCode);
-
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true
+            });
+#else
             var chromiumExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
 
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
@@ -84,6 +115,7 @@ namespace CodeToImageGenerator.Common
                     "--disable-dev-shm-usage", 
                     "--disable-gpu"]
             });
+#endif
 
             using var page = await browser.NewPageAsync();
 
@@ -126,6 +158,19 @@ namespace CodeToImageGenerator.Common
             {
                 await browser.CloseAsync();
             }
+        }
+
+        private static string PrepareHTML(string language, string code)
+        {
+            var htmlTemplate = File.ReadAllText("code.html");
+
+            var escapedCode = HttpUtility.HtmlEncode(code);
+
+            var finalHtml = htmlTemplate
+                .Replace("{language}", language)
+                .Replace("{code}", escapedCode);
+
+            return finalHtml;
         }
     }
 }

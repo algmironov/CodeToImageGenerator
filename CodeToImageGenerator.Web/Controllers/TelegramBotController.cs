@@ -9,6 +9,9 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CodeToImageGenerator.Web.Controllers
 {
+    /// <summary>
+    ////Этот контроллер в будущих итерациях будет использоваться для работу бота через WebHook
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase

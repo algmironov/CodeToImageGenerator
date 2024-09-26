@@ -22,4 +22,8 @@
     <PackageReference Include="PuppeteerSharp" Version="20.0.1-beta1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CodeToImageGenerator.Common\CodeToImageGenerator.Common.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text.Json;
 
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
@@ -13,8 +14,8 @@ namespace CodeToImageGenerator.Web.Controllers
         private readonly TelegramBotService _botService;
         private readonly IImageService _imageService;
 
-        public HomeController(ILogger<HomeController> logger, 
-                                TelegramBotService telegramBotService, 
+        public HomeController(ILogger<HomeController> logger,
+                                TelegramBotService telegramBotService,
                                 IImageService imageService)
         {
             _logger = logger;
@@ -23,19 +24,47 @@ namespace CodeToImageGenerator.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(long? chatId)
+        public IActionResult Index(PageViewModel? viewModel)
         {
-            var viewModel = new PageViewModel
+            if (IsValid(viewModel))
             {
-                IsFromTelegram = chatId.HasValue,
-                CodeSubmission = new CodeSubmission
-                {
-                    ChatId = chatId
-                }
-            };
+                return View(viewModel);
+            }
 
-            return View(viewModel);
+            try
+            {
+                var telegramDataJson = HttpContext.Session.GetString("TelegramData");
+                if (!string.IsNullOrEmpty(telegramDataJson))
+                {
+                    var telegramData = JsonSerializer.Deserialize<TelegramMiniAppData>(telegramDataJson);
+
+                    _logger.LogInformation("Received TelegramData: {telegramData}", telegramData);
+
+                    viewModel = new PageViewModel
+                    {
+                        IsFromTelegram = true,
+                        CodeSubmission = new CodeSubmission
+                        {
+                            ChatId = telegramData.User.Id,
+                        }
+                    };
+                    return View(viewModel);
+                }
+                return View(new PageViewModel());
+            }
+            catch (Exception)
+            {
+                viewModel = new PageViewModel
+                {
+                    IsFromTelegram = false,
+                    CodeSubmission = new CodeSubmission
+                    {
+                    }
+                };
+                return View(viewModel);
+            }
         }
+
 
         [HttpPost]
         [Route("/Home/SubmitCode")]
@@ -57,7 +86,7 @@ namespace CodeToImageGenerator.Web.Controllers
 
                         await _botService.SendImageFromCodeAsync((long)chatId, programmingLanguage, code);
 
-                        return RedirectToAction("Index", chatId);
+                        return View("Index", viewModel);
                     }
                     _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
 
@@ -79,7 +108,6 @@ namespace CodeToImageGenerator.Web.Controllers
                     var code = codeSubmission.Code;
 
                     return RedirectToAction("DownloadImage", new { programmingLanguage, code });
-
                 }
                 catch (Exception ex)
                 {
@@ -88,9 +116,7 @@ namespace CodeToImageGenerator.Web.Controllers
                     return View("Index", viewModel);
                 }
             }
-
             return View("Index", viewModel);
-
         }
 
         [HttpGet]
@@ -100,6 +126,12 @@ namespace CodeToImageGenerator.Web.Controllers
             var filename = _imageService.GenerateFileName(programmingLanguage);
 
             return File(imageStream, "image/png", filename);
+        }
+
+        [HttpPost]
+        public IActionResult CloseAlert(PageViewModel viewModel)
+        {
+            return RedirectToAction("Index", viewModel);
         }
 
         public IActionResult Privacy()
@@ -116,6 +148,13 @@ namespace CodeToImageGenerator.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private static bool IsValid(PageViewModel? viewModel)
+        {
+            return viewModel != null 
+                && viewModel.CodeSubmission != null 
+                && viewModel.CodeSubmission.ChatId.HasValue;
         }
     }
 }

@@ -20,7 +20,7 @@ RUN dotnet publish "CodeToImageGenerator.Web.csproj" -c Release -o /app/publish
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 
-# Установка зависимостей для Chromium
+# Installing dependencies for Chromium
 RUN apt-get update && apt-get install -y \
     wget \
     ca-certificates \
@@ -43,15 +43,19 @@ RUN apt-get update && apt-get install -y \
     libgconf-2-4 \
     --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
-# Скачивание и установка Chromium
+# Downloading and installing Chromium
 RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
     && apt-get update && apt-get install -y ./google-chrome-stable_current_amd64.deb \
     && rm google-chrome-stable_current_amd64.deb
 
-# Определение пути к исполняемому файлу Chromium через переменную окружения
+# Setting environment variable for Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
-# Создание нового пользователя
+# Setting environment variable for TG bot and mini app url
+# ENV BOT_TOKEN="Place_your_bot_token_here"
+# ENV WEB_APP_URL="PLace_your_mini_app_url_here"
+
+# Creating new user
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
     && mkdir -p /home/pptruser/Downloads \
     && chown -R pptruser:pptruser /home/pptruser \

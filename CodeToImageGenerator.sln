@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator", "CodeToImageGenerator\CodeToImageGenerator.csproj", "{0B6BB298-1A27-4136-BD46-C6D11A584CAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeToImageGenerator.Demo", "CodeToImageGenerator\CodeToImageGenerator.Demo.csproj", "{0B6BB298-1A27-4136-BD46-C6D11A584CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator.Common", "CodeToImageGenerator.Common\CodeToImageGenerator.Common.csproj", "{F44DA5C0-6C22-4266-B269-8E41397E767A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeToImageGenerator.Common", "CodeToImageGenerator.Common\CodeToImageGenerator.Common.csproj", "{F44DA5C0-6C22-4266-B269-8E41397E767A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeToImageGenerator.Web", "CodeToImageGenerator.Web\CodeToImageGenerator.Web.csproj", "{EA92EB59-66BC-43A6-A0B0-71F6495B346F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CodeToImageGenerator.Web", "CodeToImageGenerator.Web\CodeToImageGenerator.Web.csproj", "{EA92EB59-66BC-43A6-A0B0-71F6495B346F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
