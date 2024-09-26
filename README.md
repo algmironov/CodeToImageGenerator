@@ -26,6 +26,10 @@
 BOT_TOKEN=your_token
 WEB_APP_URL=your_url
 ```
+Затем при старте образа добавить `--env-file .env` , например команда запуска может выглядеть так:
+```
+docker run --env-file .env -d -p 8080:80 codetoimagegenerator:latest
+``` 
 
 ## Технологии
 Для создания скриншотов используется библиотека [Puppeteer.Sharp](https://github.com/hardkoded/puppeteer-sharp) -> скачивает (или использует предварительно скачанный дистрибутив) Chromium
