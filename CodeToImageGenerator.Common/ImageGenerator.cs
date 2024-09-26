@@ -91,11 +91,18 @@ namespace CodeToImageGenerator.Common
         /// <param name="lang">Язык программирования</param>
         /// <param name="code">Фрагмент кода</param>
         /// <returns>Имя файла с изображением</returns>
-        [Obsolete("Метод сохраняет изображение локально, что в данном приложении не используется")]
         public async static Task<string> GenerateImage(string lang, string code)
         {
             var finalHtml = PrepareHTML(lang, code);
 
+#if DEBUG
+            await new BrowserFetcher().DownloadAsync();
+
+            var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true
+            });
+#else
             var chromiumExecutablePath = Environment.GetEnvironmentVariable("PUPPETEER_EXECUTABLE_PATH");
 
             var browser = await Puppeteer.LaunchAsync(new LaunchOptions
@@ -108,6 +115,7 @@ namespace CodeToImageGenerator.Common
                     "--disable-dev-shm-usage", 
                     "--disable-gpu"]
             });
+#endif
 
             using var page = await browser.NewPageAsync();
 
