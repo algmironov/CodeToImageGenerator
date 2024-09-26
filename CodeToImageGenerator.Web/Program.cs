@@ -1,6 +1,5 @@
 using System.Net; // используется в Release сборке, не удалять!
 
-using CodeToImageGenerator.Web.Middleware;
 using CodeToImageGenerator.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -52,8 +51,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseSession();
-
-app.UseTelegramMiniAppMiddleware();
 
 app.UseRouting();
 

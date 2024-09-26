@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using System.Text.Json;
 
-using CodeToImageGenerator.Web.Middleware;
 using CodeToImageGenerator.Web.Models;
 using CodeToImageGenerator.Web.Services;
 
