@@ -14,8 +14,8 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "BOT_TOKEN": "7872696969:AAEg3Jp7zCzCMDCL1v1Z-eleciIfnxx2z2I",
-        "WEB_APP_URL": "https://3ww9c39groyq.share.zrok.io/miniapp"
+        "BOT_TOKEN": "",
+        "WEB_APP_URL": ""
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7029;http://localhost:5254"
