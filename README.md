@@ -82,7 +82,7 @@ docker run --env-file .env -d -p 8080:80 codetoimagegenerator:latest
 - Темы (светлая/темная)
 
 ### Как научиться создавать своих ботов на .NET
-[Курс PRO C#. Создание Telegram бота](https://stepik.org/205788)
+[Курс PRO C#. Создание Telegram бота](https://stepik.org/a/205788)
  
 
    
