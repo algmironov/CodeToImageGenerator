@@ -51,9 +51,6 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 # Setting environment variable for Chromium
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
-# Setting environment variable for TG bot and mini app url
-# ENV BOT_TOKEN="Place_your_bot_token_here"
-# ENV WEB_APP_URL="PLace_your_mini_app_url_here"
 
 # Creating new user
 RUN groupadd -r pptruser && useradd -r -g pptruser -G audio,video pptruser \
