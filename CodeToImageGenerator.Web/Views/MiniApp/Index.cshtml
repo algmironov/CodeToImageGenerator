@@ -7,9 +7,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@ViewData["Title"]</title>
-    //<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-   // <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    //<link rel="stylesheet" href="~/CodeToImageGenerator.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/CodeToImageGenerator.Web.styles.css" asp-append-version="true" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="~/css/loader.css"/>
 
@@ -60,33 +60,6 @@
    
 </body>
 </html>
-@* @section Scripts {
-    <script>
-        window.onload = function () {
-            const hash = window.location.hash.substring(1);
-            if (hash) {
-                const params = new URLSearchParams(hash);
-                console.log(params);
-                const tgWebAppData = params.get('tgWebAppData');
-                if (tgWebAppData) {
-                    fetch('/api/telegram-data', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ tgWebAppData: tgWebAppData }),
-                    }).then(response => {
-                        if (!response.ok) {
-                            console.error('Failed to send Telegram data');
-                        }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    });
-                }
-            }
-        };
-    </script>
-} *@
 
 
 @section Scripts {
