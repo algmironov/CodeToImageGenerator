@@ -32,7 +32,7 @@ docker run --env-file .env -d -p 8080:80 codetoimagegenerator:latest
 ``` 
 
 ## Технологии
-Для создания скриншотов используется библиотека [Puppeteer.Sharp](https://github.com/hardkoded/puppeteer-sharp) -> скачивает (или использует предварительно скачанный дистрибутив) Chromium
+Для создания скриншотов используется библиотека [Puppeteer.Sharp](https://github.com/hardkoded/puppeteer-sharp) -> скачивает (или использует предварительно скачанный дистрибутив) `Chromium`. Для релизной сборки в `dokerfile` прописана установка с зависимостями => самостоятельно устанавливать не нужно, `Chromium` скачается во время сборки образа.
 
 Для работы Телеграм бота - [Telegram.Bot](https://github.com/TelegramBots/telegram.bot)
 
