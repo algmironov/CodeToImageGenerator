@@ -13,12 +13,16 @@ namespace CodeToImageGenerator.Web.Services
         private readonly ILogger<TelegramBotService> _logger;
         private readonly IImageService _imageService;
         private readonly string _miniAppUrl;
+        private readonly string _webHookUrl;
         private const string WelcomeMessage = "Привет! Для получения картинки с Вашим кодом откройте мини-приложение";
 
-        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService, string botToken, string miniAppUrl)
+        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService, string botToken, string miniAppUrl, string webHookUrl)
         {
             ArgumentNullException.ThrowIfNull(botToken, nameof(botToken));
             ArgumentNullException.ThrowIfNull(miniAppUrl, nameof(miniAppUrl));
+            ArgumentNullException.ThrowIfNull(webHookUrl, nameof(webHookUrl));
+
+            _webHookUrl = webHookUrl;
 
             _miniAppUrl = miniAppUrl;
 
@@ -33,17 +37,28 @@ namespace CodeToImageGenerator.Web.Services
             _botClient = new TelegramBotClient(botToken, httpClient);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _botClient.StartReceiving(
-                HandleUpdateAsync,
-                HandleErrorAsync,
-                new ReceiverOptions(),
-                cancellationToken
-            );
+            await _botClient.SetWebhookAsync(
+                url: _webHookUrl,
+                cancellationToken: cancellationToken
+                );
+
+            var info = await _botClient.GetWebhookInfoAsync();
+            
+
+            _logger.LogInformation("WebHook info: {info.LastErrorMessage}, webhook url: {info.Url}", info.LastErrorMessage, info.Url);
+
+            //_botClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, cancellationToken: cancellationToken);
+
+            //_botClient.StartReceiving(
+            //    HandleUpdateAsync,
+            //    HandleErrorAsync,
+            //    new ReceiverOptions(),
+            //    cancellationToken
+            //);
 
             _logger.LogInformation("Bot started...");
-            return Task.CompletedTask;
         }
 
         public async Task SendImageFromCodeAsync(long chatId, string language, string code)
@@ -65,9 +80,19 @@ namespace CodeToImageGenerator.Web.Services
         public Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Bot stopped...");
+            _botClient.DeleteWebhookAsync();
             return Task.CompletedTask;
         }
 
+        public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
+        {
+            await HandleUpdateAsync(_botClient, update, cancellationToken);
+        }
+
+        public async Task HandleErrorAsync(Exception exception, CancellationToken cancellationToken)
+        {
+            await HandleErrorAsync(_botClient, exception, cancellationToken);
+        }
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             if (update.Type == UpdateType.Message && update.Message!.Text != null)

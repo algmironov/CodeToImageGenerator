@@ -14,8 +14,9 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "BOT_TOKEN": "",
-        "WEB_APP_URL": ""
+        "BOT_TOKEN": "7872696969:AAG7AiVwn_G2ISKdE65p5vDjVj86pM_4w8s",
+        "WEB_APP_URL": "https://trtrbdwt4ds2.share.zrok.io/miniapp",
+        "WEBHOOK_URL": "https://trtrbdwt4ds2.share.zrok.io/webhook/update"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7029;http://localhost:5254"

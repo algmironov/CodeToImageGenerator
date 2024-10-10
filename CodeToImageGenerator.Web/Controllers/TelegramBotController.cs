@@ -1,11 +1,8 @@
-﻿using CodeToImageGenerator.Web.Models;
+﻿using CodeToImageGenerator.Web.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
-using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
-using Telegram.Bot.Types.ReplyMarkups;
 
 namespace CodeToImageGenerator.Web.Controllers
 {
@@ -13,55 +10,31 @@ namespace CodeToImageGenerator.Web.Controllers
     ////Этот контроллер в будущих итерациях будет использоваться для работу бота через WebHook
     /// </summary>
     [ApiController]
-    [Route("api/[controller]")]
     public class TelegramBotController : ControllerBase
     {
-        private readonly ITelegramBotClient _botClient;
+        private readonly TelegramBotService _botService;
+        private readonly ILogger _logger;
 
-        public TelegramBotController(ITelegramBotClient botClient)
+        public TelegramBotController(TelegramBotService botService, ILogger<TelegramBotController> logger)
         {
-            _botClient = botClient;
+            _botService = botService;
+            _logger = logger;
         }
 
-        [HttpPost("update")]
+        [HttpPost("/webhook/update")]
         public async Task<IActionResult> Update([FromBody] Update update)
         {
-            if (update.Type == UpdateType.Message && update.Message?.Text != null)
-            {
-                await HandleMessage(update.Message);
-            }
-            else if (update.Type == UpdateType.MyChatMember)
-            {
-                // Обработка изменений статуса бота в чате
-            }
-            return Ok();
-        }
 
-        private async Task HandleMessage(Message message)
-        {
-            if (message.Text.StartsWith("/start"))
+            try
             {
-                var keyboard = new InlineKeyboardMarkup(
-                    InlineKeyboardButton.WithWebApp("Открыть форму",
-                        new WebAppInfo { Url = "https://your-web-app-url.com" }));
-
-                await _botClient.SendTextMessageAsync(message.Chat.Id,
-                    "Привет! Нажми на кнопку, чтобы открыть форму для отправки кода.",
-                    replyMarkup: keyboard);
+                await _botService.HandleUpdateAsync(update, cancellationToken: CancellationToken.None);
             }
-        }
-
-        [HttpPost("webhook")]
-        public async Task<IActionResult> Webhook([FromBody] Update update)
-        {
-            if (update.Type == UpdateType.Message && update.Message?.WebAppData != null)
+            catch (Exception ex)
             {
-                var data = System.Text.Json.JsonSerializer.Deserialize<CodeSubmission>(update.Message.WebAppData.Data);
-
-                // Здесь можно обработать полученные данные
-                await _botClient.SendTextMessageAsync(update.Message.Chat.Id,
-                    $"Получен код на языке {data.ProgrammingLanguage}:\n\n{data.Code}");
+                _logger.LogError("Ошибка при обработке обновления: {ex}", ex);
+                await _botService.HandleErrorAsync(ex, cancellationToken: CancellationToken.None);
             }
+            
             return Ok();
         }
     }

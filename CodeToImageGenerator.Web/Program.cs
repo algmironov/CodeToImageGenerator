@@ -1,4 +1,5 @@
 using System.Net; // используется в Release сборке, не удалять!
+using System.Reflection.PortableExecutable;
 
 using CodeToImageGenerator.Web.Services;
 
@@ -15,6 +16,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
 var webAppAddress = Environment.GetEnvironmentVariable("WEB_APP_URL");
+var webHookUrl = Environment.GetEnvironmentVariable("WEBHOOK_URL");
 
 builder.Services.AddControllersWithViews();
 
@@ -24,7 +26,8 @@ builder.Services.AddSingleton<TelegramBotService>(
         sp.GetRequiredService<ILogger<TelegramBotService>>(),
         sp.GetRequiredService<IImageService>(),
         botToken,
-        webAppAddress
+        webAppAddress,
+        webHookUrl
     ));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
