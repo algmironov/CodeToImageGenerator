@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -44,19 +43,10 @@ namespace CodeToImageGenerator.Web.Services
                 cancellationToken: cancellationToken
                 );
 
-            var info = await _botClient.GetWebhookInfoAsync();
+            var info = await _botClient.GetWebhookInfoAsync(cancellationToken: cancellationToken);
             
 
             _logger.LogInformation("WebHook info: {info.LastErrorMessage}, webhook url: {info.Url}", info.LastErrorMessage, info.Url);
-
-            //_botClient.StartReceiving(HandleUpdateAsync, HandleErrorAsync, cancellationToken: cancellationToken);
-
-            //_botClient.StartReceiving(
-            //    HandleUpdateAsync,
-            //    HandleErrorAsync,
-            //    new ReceiverOptions(),
-            //    cancellationToken
-            //);
 
             _logger.LogInformation("Bot started...");
         }
@@ -69,31 +59,20 @@ namespace CodeToImageGenerator.Web.Services
 
             var inputFile = new InputFileStream(image, fileName);
 
-            var keyboard = GetWebAppKeyboard(chatId);
+            var keyboard = GetWebAppKeyboard();
 
             await _botClient.SendPhotoAsync(chatId: chatId,
                                             photo: inputFile,
-                                            caption: $"Ваше изображение с кодом на языке {language}",
                                             replyMarkup: keyboard);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Bot stopped...");
-            _botClient.DeleteWebhookAsync();
-            return Task.CompletedTask;
+            await  _botClient.DeleteWebhookAsync(cancellationToken: cancellationToken);
         }
 
         public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
-        {
-            await HandleUpdateAsync(_botClient, update, cancellationToken);
-        }
-
-        public async Task HandleErrorAsync(Exception exception, CancellationToken cancellationToken)
-        {
-            await HandleErrorAsync(_botClient, exception, cancellationToken);
-        }
-        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
             if (update.Type == UpdateType.Message && update.Message!.Text != null)
             {
@@ -101,7 +80,7 @@ namespace CodeToImageGenerator.Web.Services
             }
         }
 
-        private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        public async Task HandleErrorAsync(Exception exception, CancellationToken cancellationToken)
         {
             var errorMessage = exception switch
             {
@@ -110,7 +89,7 @@ namespace CodeToImageGenerator.Web.Services
             };
 
             _logger.LogError("Возникла ошибка: {errorMessage}", errorMessage);
-            return Task.CompletedTask;
+            
         }
 
         private async Task HandleMessageAsync(Message message)
@@ -119,7 +98,7 @@ namespace CodeToImageGenerator.Web.Services
             {
                 var chatId = message.Chat.Id;
 
-                var keyboard = GetWebAppKeyboard(chatId);
+                var keyboard = GetWebAppKeyboard();
                 try
                 {
                     await _botClient.SendTextMessageAsync(chatId, 
@@ -137,7 +116,7 @@ namespace CodeToImageGenerator.Web.Services
             }
         }
 
-        private IReplyMarkup GetWebAppKeyboard(long chatId)
+        private InlineKeyboardMarkup GetWebAppKeyboard()
         {
 
             var webApp = new WebAppInfo

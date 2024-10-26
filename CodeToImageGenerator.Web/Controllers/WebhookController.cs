@@ -7,15 +7,15 @@ using Telegram.Bot.Types;
 namespace CodeToImageGenerator.Web.Controllers
 {
     /// <summary>
-    ////Этот контроллер в будущих итерациях будет использоваться для работу бота через WebHook
+    ////Этот контроллер используется для работы бота через WebHook
     /// </summary>
     [ApiController]
-    public class TelegramBotController : ControllerBase
+    public class WebhookController : ControllerBase
     {
         private readonly TelegramBotService _botService;
         private readonly ILogger _logger;
 
-        public TelegramBotController(TelegramBotService botService, ILogger<TelegramBotController> logger)
+        public WebhookController(TelegramBotService botService, ILogger<WebhookController> logger)
         {
             _botService = botService;
             _logger = logger;
