@@ -14,7 +14,7 @@
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "BOT_TOKEN": "7872696969:AAG7AiVwn_G2ISKdE65p5vDjVj86pM_4w8s",
+        "BOT_TOKEN": "",
         "WEB_APP_URL": "https://r6db0bhe95dc.share.zrok.io/miniapp",
         "WEBHOOK_URL": "https://r6db0bhe95dc.share.zrok.io/webhook/update"
       },
