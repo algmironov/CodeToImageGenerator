@@ -1,6 +1,9 @@
 using System.Net; // используется в Release сборке, не удалять!
+using System.Reflection.PortableExecutable;
+using Newtonsoft.Json;
 
 using CodeToImageGenerator.Web.Services;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +18,7 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 
 var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
 var webAppAddress = Environment.GetEnvironmentVariable("WEB_APP_URL");
+var webHookUrl = Environment.GetEnvironmentVariable("WEBHOOK_URL");
 
 builder.Services.AddControllersWithViews();
 
@@ -24,13 +28,11 @@ builder.Services.AddSingleton<TelegramBotService>(
         sp.GetRequiredService<ILogger<TelegramBotService>>(),
         sp.GetRequiredService<IImageService>(),
         botToken,
-        webAppAddress
+        webAppAddress,
+        webHookUrl
     ));
 
-builder.Services.AddControllers().AddJsonOptions(options =>
-{
-    options.JsonSerializerOptions.PropertyNamingPolicy = null;
-});
+builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddSession(options =>
 {
@@ -62,6 +64,23 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "TelegramWebApp",
     pattern: "{controller=Home}/{action=Index}/{initData}");
+
+app.Use(async (context, next) =>
+{
+    Console.WriteLine($"Request received: {context.Request.Path}");
+    Console.WriteLine($"Request method: {context.Request.Method}");
+    Console.WriteLine($"Content-Type: {context.Request.ContentType}");
+
+    using var reader = new StreamReader(context.Request.Body);
+    var body = await reader.ReadToEndAsync();
+    Console.WriteLine($"Request body: {body}");
+
+    context.Request.Body = new MemoryStream(Encoding.UTF8.GetBytes(body));
+
+    await next();
+
+    Console.WriteLine($"Response status code: {context.Response.StatusCode}");
+});
 
 app.MapControllers();
 

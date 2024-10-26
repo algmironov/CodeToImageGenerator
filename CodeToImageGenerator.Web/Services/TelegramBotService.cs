@@ -1,6 +1,5 @@
 ﻿using Telegram.Bot;
 using Telegram.Bot.Exceptions;
-using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -13,12 +12,16 @@ namespace CodeToImageGenerator.Web.Services
         private readonly ILogger<TelegramBotService> _logger;
         private readonly IImageService _imageService;
         private readonly string _miniAppUrl;
+        private readonly string _webHookUrl;
         private const string WelcomeMessage = "Привет! Для получения картинки с Вашим кодом откройте мини-приложение";
 
-        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService, string botToken, string miniAppUrl)
+        public TelegramBotService(ILogger<TelegramBotService> logger, IImageService imageService, string botToken, string miniAppUrl, string webHookUrl)
         {
             ArgumentNullException.ThrowIfNull(botToken, nameof(botToken));
             ArgumentNullException.ThrowIfNull(miniAppUrl, nameof(miniAppUrl));
+            ArgumentNullException.ThrowIfNull(webHookUrl, nameof(webHookUrl));
+
+            _webHookUrl = webHookUrl;
 
             _miniAppUrl = miniAppUrl;
 
@@ -33,17 +36,19 @@ namespace CodeToImageGenerator.Web.Services
             _botClient = new TelegramBotClient(botToken, httpClient);
         }
 
-        public Task StartAsync(CancellationToken cancellationToken)
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
-            _botClient.StartReceiving(
-                HandleUpdateAsync,
-                HandleErrorAsync,
-                new ReceiverOptions(),
-                cancellationToken
-            );
+            await _botClient.SetWebhookAsync(
+                url: _webHookUrl,
+                cancellationToken: cancellationToken
+                );
+
+            var info = await _botClient.GetWebhookInfoAsync(cancellationToken: cancellationToken);
+            
+
+            _logger.LogInformation("WebHook info: {info.LastErrorMessage}, webhook url: {info.Url}", info.LastErrorMessage, info.Url);
 
             _logger.LogInformation("Bot started...");
-            return Task.CompletedTask;
         }
 
         public async Task SendImageFromCodeAsync(long chatId, string language, string code)
@@ -54,21 +59,20 @@ namespace CodeToImageGenerator.Web.Services
 
             var inputFile = new InputFileStream(image, fileName);
 
-            var keyboard = GetWebAppKeyboard(chatId);
+            var keyboard = GetWebAppKeyboard();
 
             await _botClient.SendPhotoAsync(chatId: chatId,
                                             photo: inputFile,
-                                            caption: $"Ваше изображение с кодом на языке {language}",
                                             replyMarkup: keyboard);
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Bot stopped...");
-            return Task.CompletedTask;
+            await  _botClient.DeleteWebhookAsync(cancellationToken: cancellationToken);
         }
 
-        private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
+        public async Task HandleUpdateAsync(Update update, CancellationToken cancellationToken)
         {
             if (update.Type == UpdateType.Message && update.Message!.Text != null)
             {
@@ -76,7 +80,7 @@ namespace CodeToImageGenerator.Web.Services
             }
         }
 
-        private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)
+        public async Task HandleErrorAsync(Exception exception, CancellationToken cancellationToken)
         {
             var errorMessage = exception switch
             {
@@ -85,7 +89,7 @@ namespace CodeToImageGenerator.Web.Services
             };
 
             _logger.LogError("Возникла ошибка: {errorMessage}", errorMessage);
-            return Task.CompletedTask;
+            
         }
 
         private async Task HandleMessageAsync(Message message)
@@ -94,7 +98,7 @@ namespace CodeToImageGenerator.Web.Services
             {
                 var chatId = message.Chat.Id;
 
-                var keyboard = GetWebAppKeyboard(chatId);
+                var keyboard = GetWebAppKeyboard();
                 try
                 {
                     await _botClient.SendTextMessageAsync(chatId, 
@@ -112,7 +116,7 @@ namespace CodeToImageGenerator.Web.Services
             }
         }
 
-        private IReplyMarkup GetWebAppKeyboard(long chatId)
+        private InlineKeyboardMarkup GetWebAppKeyboard()
         {
 
             var webApp = new WebAppInfo
