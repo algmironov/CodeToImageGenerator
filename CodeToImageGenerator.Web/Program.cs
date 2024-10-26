@@ -4,6 +4,8 @@ using Newtonsoft.Json;
 
 using CodeToImageGenerator.Web.Services;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+using CodeToImageGenerator.Web.Db;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,10 @@ var webHookUrl = Environment.GetEnvironmentVariable("WEBHOOK_URL");
 
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlite("Data Source=statistics.db"));
+builder.Services.AddTransient<IStatisticsRepository, StatisticsRepository>();
+builder.Services.AddTransient<IStatisticsService, StatisticsService>();
 builder.Services.AddTransient<IImageService, ImageService>();
 builder.Services.AddSingleton<TelegramBotService>(
         sp => new TelegramBotService(
@@ -33,6 +39,8 @@ builder.Services.AddSingleton<TelegramBotService>(
     ));
 
 builder.Services.AddControllers().AddNewtonsoftJson();
+
+
 
 builder.Services.AddSession(options =>
 {
@@ -49,6 +57,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
@@ -64,6 +74,9 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "TelegramWebApp",
     pattern: "{controller=Home}/{action=Index}/{initData}");
+app.MapControllerRoute(
+    name: "Statistics",
+    pattern: "{controller=Statistics}/{action=Index}");
 
 app.Use(async (context, next) =>
 {

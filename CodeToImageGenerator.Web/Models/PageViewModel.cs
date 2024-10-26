@@ -3,6 +3,7 @@
     public class PageViewModel
     {
         public bool IsFromTelegram { get; set; } = false;
+        public StatisticsViewModel? Statistics { get; set; }
 
         private CodeSubmission? _codeSubmission;
         public CodeSubmission? CodeSubmission 
