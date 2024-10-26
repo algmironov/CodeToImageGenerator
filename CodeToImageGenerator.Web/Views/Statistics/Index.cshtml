@@ -1,0 +1,61 @@
+﻿@using CodeToImageGenerator.Web.Models;
+
+@model PageViewModel
+
+<title>Statistics</title>
+
+
+
+<div class="container">
+    <div class="align-content-center">
+        <h1>Statistics</h1>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Overall Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <p>Total Requests: @Model.Statistics?.TotalRequests</p>
+                    <p>Successful Requests: @Model.Statistics?.SuccessfulRequests</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>By Source</h5>
+                </div>
+                <div class="card-body m-1">
+                    <ul class="list-group">
+                        @foreach (var source in Model.Statistics?.BySource)
+                        {
+                            <li>@source.Source: @source.Count</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>By Programming Language</h5>
+            </div>
+            <div class="card-body m-1">
+                <ul class="list-group">
+                    @foreach (var language in Model.Statistics?.ByLanguage)
+                    {
+                        <li>@language.Language: @language.Count</li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -13,19 +13,23 @@ namespace CodeToImageGenerator.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly TelegramBotService _botService;
         private readonly IImageService _imageService;
+        private readonly IStatisticsService _statisticsService;
 
         public HomeController(ILogger<HomeController> logger,
                                 TelegramBotService telegramBotService,
-                                IImageService imageService)
+                                IImageService imageService,
+                                IStatisticsService statisticsService)
         {
             _logger = logger;
             _botService = telegramBotService;
             _imageService = imageService;
+            _statisticsService = statisticsService;
         }
 
         [HttpGet]
         public IActionResult Index(PageViewModel? viewModel)
         {
+
             if (IsValid(viewModel))
             {
                 return View(viewModel);
@@ -70,51 +74,43 @@ namespace CodeToImageGenerator.Web.Controllers
         [Route("/Home/SubmitCode")]
         public async Task<IActionResult> SubmitCode([FromForm] PageViewModel viewModel)
         {
+            var isSuccessful = false;
             var codeSubmission = viewModel.CodeSubmission;
 
             _logger.LogInformation("Received data: {viewModel}", viewModel);
-
-            if (viewModel.IsFromTelegram)
+            
+            try
             {
-                try
-                {
-                    if (codeSubmission != null && ModelState.IsValid)
-                    {
-                        var programmingLanguage = codeSubmission.ProgrammingLanguage;
-                        var code = codeSubmission.Code;
-                        var chatId = codeSubmission.ChatId;
-
-                        await _botService.SendImageFromCodeAsync((long)chatId, programmingLanguage, code);
-
-                        return View("Index", viewModel);
-                    }
-                    _logger.LogWarning("Invalid model state: {ModelState}", ModelState);
-
-                    return View("Index", viewModel);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error deserializing JSON");
-
-                    return View("Index", viewModel);
-                }
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
+                if (viewModel.IsFromTelegram && codeSubmission != null && ModelState.IsValid)
                 {
                     var programmingLanguage = codeSubmission.ProgrammingLanguage;
                     var code = codeSubmission.Code;
+                    var chatId = codeSubmission.ChatId;
+
+                    await _botService.SendImageFromCodeAsync((long)chatId, programmingLanguage, code);
+                    isSuccessful = true;
+                }
+                else if (ModelState.IsValid)
+                {
+
+                    var programmingLanguage = codeSubmission.ProgrammingLanguage;
+                    var code = codeSubmission.Code;
+                    isSuccessful = true;
 
                     return RedirectToAction("DownloadImage", new { programmingLanguage, code });
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(message: "An Error occured during image generation for web user", ex);
-
-                    return View("Index", viewModel);
-                }
+            }
+            catch (Exception ex)
+            {
+                isSuccessful = false;
+                _logger.LogError(ex, "An Error occured during image generation for web user");
+            }
+            finally
+            {
+                await _statisticsService.LogGenerationAttemptAsync(
+                                                viewModel.IsFromTelegram ? "Telegram" : "Web",
+                                                codeSubmission?.ProgrammingLanguage,
+                                                isSuccessful);
             }
             return View("Index", viewModel);
         }
@@ -152,8 +148,8 @@ namespace CodeToImageGenerator.Web.Controllers
 
         private static bool IsValid(PageViewModel? viewModel)
         {
-            return viewModel != null 
-                && viewModel.CodeSubmission != null 
+            return viewModel != null
+                && viewModel.CodeSubmission != null
                 && viewModel.CodeSubmission.ChatId.HasValue;
         }
     }
