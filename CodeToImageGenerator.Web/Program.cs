@@ -1,6 +1,4 @@
 using System.Net; // используется в Release сборке, не удалять!
-using System.Reflection.PortableExecutable;
-using Newtonsoft.Json;
 
 using CodeToImageGenerator.Web.Services;
 using System.Text;
@@ -21,6 +19,12 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 var botToken = Environment.GetEnvironmentVariable("BOT_TOKEN");
 var webAppAddress = Environment.GetEnvironmentVariable("WEB_APP_URL");
 var webHookUrl = Environment.GetEnvironmentVariable("WEBHOOK_URL");
+
+{
+    if (botToken == null) throw new ArgumentNullException(paramName: nameof(botToken), message: "botToken cannot be null!");
+    if (webAppAddress == null) throw new ArgumentNullException(paramName: nameof(webAppAddress), message: "webAppAddress cannot be null!");
+    if (webHookUrl == null) throw new ArgumentNullException(paramName: nameof(webHookUrl), message: "webHookUrl cannot be null!");
+}
 
 builder.Services.AddControllersWithViews();
 

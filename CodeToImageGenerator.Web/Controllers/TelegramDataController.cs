@@ -1,6 +1,8 @@
 ﻿using CodeToImageGenerator.Web.Models.DTO;
 using CodeToImageGenerator.Web.Models;
 
+using TelegramWebAppDataValidator;
+
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 using System.Web;
@@ -20,22 +22,30 @@ namespace CodeToImageGenerator.Web.Controllers
                 return RedirectToAction("Index", "Home", new { isFromTelegram = false });
             }
 
+            var IsValid = Validator.Validate(data.TgWebAppData, Environment.GetEnvironmentVariable("BOT_TOKEN"));
+
             var decodedData = HttpUtility.UrlDecode(data.TgWebAppData);
             Console.WriteLine($"Decoded data: {decodedData}");
 
-            try
+            if (IsValid)
             {
-                var parsedData = ParseTelegramData(decodedData);
-                HttpContext.Session.SetString("TelegramData", JsonSerializer.Serialize(parsedData));
+                try
+                {
+                    var parsedData = ParseTelegramData(decodedData);
+                    HttpContext.Session.SetString("TelegramData", JsonSerializer.Serialize(parsedData));
 
-                return RedirectToAction("Index", "Home", new { isFromTelegram = true });
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error parsing data: {ex.Message}");
+                    return RedirectToAction("Index", "Home", new { isFromTelegram = true });
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error parsing data: {ex.Message}");
 
-                return RedirectToAction("Index", "Home", new { isFromTelegram = false });
+                    return RedirectToAction("Index", "Home", new { isFromTelegram = false });
+                }
             }
+
+            return RedirectToAction("Index", "Home", new { isFromTelegram = false });
+
         }
 
         private TelegramMiniAppData ParseTelegramData(string data)
