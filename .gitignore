@@ -362,3 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /CodeToImageGenerator/CodeToImageGenerator.Demo.csproj
+/CodeToImageGenerator.Web/statistics.db
+/CodeToImageGenerator.Web/statistics.db-wal
+/CodeToImageGenerator.Web/statistics.db-shm
